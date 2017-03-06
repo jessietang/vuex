@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>更改Vuex里面store中的state的唯一方法是提交mutations</title>
+    <script src="js/vue.min.js"></script>
+    <script src="js/vuex.min.js"></script>
+</head>
+<body>
+<div id="app">
+
+</div>
+<script>
+    const store = new Vuex.Store({
+        state: {
+            count: 0
+        },
+        // 【mutation 必须是同步函数】
+        /*mutations: {
+            increment(state){
+                state.count++
+            },
+            //你可以向 store.commit 传入额外的参数，即 mutation 的 载荷（payload）
+            incrementTen(state, n){
+                state.count += n
+            },
+            // 在大多数情况下，载荷应该是一个对象，这样可以包含多个字段并且记录的 mutation 会更易读
+            anotherIncrement(state, payload){
+                state.count += payload.amount
+            }
+        }*/
+        //使用常量代替mutation事件类型
+        mutations: {
+            INCREMENT(state){
+                state.count++
+            },
+            INCREMENT_TEN(state, n){
+                state.count += n
+            },
+            ANOTHER_INCREMENT(state, payload){
+                state.count += payload.amount
+            }
+        }
+    })
+
+
+    const MyCount = {
+        template: `
+            <div>
+                <p>{{count}}</p>
+                <p>
+                    <button @click="increment">+</button>
+                    <button @click="incrementTen">+10</button>
+                    <button @click="anotherIncrement">anotherAdd</button>
+                </p>
+            </div>
+        `,
+        computed: {
+            count(){
+                return this.$store.state.count
+            }
+            // methods与computed方法的区别在于：computed的数据依赖于app.message，只要message未变，
+            // 则访问ReverseMessage计算属性将立即返回之前的计算结果，而methods则每次重新渲染时总是执行函数；
+           // 如果有缓存需要，请使用computed方法，否则使用methods替代；
+    //所以，increment这个方法写在computed里面就不行
+            /*increment(){
+                store.commit('increment')
+            }*/
+        },
+        methods: {
+            /*increment(){
+                this.$store.commit('increment')
+            },
+            incrementTen(){
+                this.$store.commit('incrementTen',10)
+            },
+            anotherIncrement(){
+                this.$store.commit('anotherIncrement',{
+                    amount: 20
+                })
+            }*/
+            increment(){
+                this.$store.commit('INCREMENT')
+            },
+            incrementTen(){
+                this.$store.commit('INCREMENT_TEN',10)
+            },
+            anotherIncrement(){
+                this.$store.commit('ANOTHER_INCREMENT',{amount: 20})
+            }
+        }
+    }
+
+
+    const app = new Vue({
+        el: '#app',
+        store,
+        components: {MyCount},
+        template: `
+            <div class="myCount">
+                <MyCount></MyCount>
+            </div>
+        `
+    })
+</script>
+</body>
+</html>

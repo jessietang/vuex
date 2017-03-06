@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="js/vue.min.js"></script>
+    <script src="js/vuex.min.js"></script>
+</head>
+<body>
+    <div id="app">
+
+    </div>
+    <script>
+        const store = new Vuex.Store({
+            state: {
+                todos: [
+                    {id: 1, text: 'this is the first msg', done: true},
+                    {id: 2, text: 'this is the second msg', done: false},
+                    {id: 3, text: 'this is the third msg', done: false},
+                    {id: 4, text: 'this is the fourth msg', done: true},
+                ]
+            },
+            //这里的getters可以理解为store的计算属性
+            getters: {
+                doneTodos: state => {
+                    return state.todos.filter(todo => todo.done)
+                },
+                doneTodosLength: (state,getters) => {
+                    return getters.doneTodos.length
+                },
+                undoneTodosLength: state => {
+                    return state.todos.filter(todo => todo.done == false).length
+                }
+            }
+        })
+
+
+        //注意这里的组件template最外层要有一个元素把它包裹起来
+        const MyList = {
+            template: `
+                <div>
+                    <p>all todos are:</p>
+                    <li v-for="todo in todos">{{todo.text}}---{{todo.done}}</li>
+                    <p>{{doneTodosLength}} lists have done are:</p>
+                    <li v-for="todo in doneTodos">{{todo.text}}---{{todo.done}}</li>
+                    <p>also have {{undoneTodosLength}} lists have not done!!!</p>
+                </div>
+            `,
+            computed: {
+                todos(){
+                    return this.$store.state.todos
+                },
+                doneTodos(){
+                    return this.$store.getters.doneTodos
+                },
+                doneTodosLength(){
+                    return this.$store.getters.doneTodosLength
+                },
+                undoneTodosLength(){
+                    return this.$store.getters.undoneTodosLength
+                }
+            }
+            /*在这之前要  import { mapGetters } from 'vuex'
+             computed: {
+                // 使用对象展开运算符将 getters 混入 computed 对象中
+                ...mapGetters([
+                        'todos',
+                        'doneTodos',
+                        // ...
+                    ])
+            }*/
+
+        }
+
+
+        const app = new Vue({
+            el: '#app',
+            store,
+            components: {MyList},
+            template: `
+                <div class="myList">
+                    <MyList></MyList>
+                </div>
+            `
+        })
+    </script>
+</body>
+</html>

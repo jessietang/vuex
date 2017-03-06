@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="js/vue.min.js"></script>
+    <script src="js/vuex.min.js"></script>
+</head>
+<body>
+    <div id="app"></div>
+    <script>
+        const store = new Vuex.Store({
+            state: {
+                message: 'my name is jessie',
+                message2: 'this is my friend'
+            },
+            mutations: {
+                UPDATE_MESSAGE(state, message){
+                    state.message = message
+                },
+                UPDATE_MESSAGE2(state, message){
+                    state.message2 = message
+                }
+            }
+        })
+
+
+        const MyComp = {
+            template: `
+                <div>
+                    <p>{{message}}</p>
+                    <!--在用户输入时，v-model 会试图直接修改 message。
+                    在严格模式中，由于这个修改不是在 mutation 函数中执行的, 这里会抛出一个错误。-->
+                    <!--<input v-model="message"/>-->
+
+                    <!--用『Vuex 的思维』去解决这个问题的方法是：给 <input> 中绑定 value，
+                    然后侦听 input 或者 change 事件，在事件回调中调用 action-->
+                    <input :value="message" @input="updateMessage"/>
+
+                    <!--另一个方法是使用带有 setter 的双向绑定计算属性-->
+                    <p>{{message2}}</p>
+                    <input type="text" v-model="message2"/>
+                </div>
+            `,
+            computed: {
+                message(){
+                    return this.$store.state.message
+                },
+                    //另一个方法是使用带有 setter 的双向绑定计算属性
+                message2: {
+                    get() {
+                        return this.$store.state.message2
+                    },
+                    set(value) {
+                        this.$store.commit('UPDATE_MESSAGE2',value)
+                    }
+                }
+            },
+            methods: {
+                updateMessage(e){
+                    this.$store.commit('UPDATE_MESSAGE',e.target.value)
+                }
+            }
+        }
+
+
+        const app = new Vue({
+            el:'#app',
+            store,
+            components: {MyComp},
+            template: `
+                <div class="myApp">
+                    <MyComp></MyComp>
+                </div>
+            `
+        })
+    </script>
+</body>
+</html>

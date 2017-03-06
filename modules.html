@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="js/vue.min.js"></script>
+    <script src="js/vuex.min.js"></script>
+</head>
+<body>
+<!--
+    具体用法可参考：https://vuex.vuejs.org/zh-cn/structure.html购物车例子
+-->
+<div id="app"></div>
+<script>
+    const moduleA = {
+        state: {
+            count: 0,
+            todos: [
+                {id: 1, text: 'this is the first msg', done: true},
+                {id: 2, text: 'this is the second msg', done: false},
+                {id: 3, text: 'this is the third msg', done: false},
+                {id: 4, text: 'this is the fourth msg', done: true},
+            ]
+        },
+        mutations: {
+            ADD(state){
+                state.count += 1
+            }
+        },
+    //Action 提交的是 mutation，而不是直接变更状态
+        actions: {
+            addAsync({commit}){
+                setTimeout(() => {
+                    commit('ADD')
+                },1000)
+            }
+        },
+        //相当于store的计算属性
+        getters: function(){
+            doneTodosLength: state => {
+                return state.todos.filter(todo => todo.done).length
+            }
+        }
+    }
+
+    const moduleB = {
+        state: {
+            count: 100
+        },
+        mutations: {
+            Add(state){
+                state.count += 100
+            }
+        },
+    //Action 提交的是 mutation，而不是直接变更状态
+        actions: {
+            addAsync({commit}){
+                setTimeout(() => {
+                    commit('ADD')
+                },1000)
+            }
+        },
+        getters: function(){
+            countAutoAdd: state => {
+                return state.count++
+            }
+        }
+    }
+
+
+    const store = new Vuex.Store({
+        /*modules: {
+            a: moduleA,
+            b: moduleB
+        }*/
+        modules: {
+            moduleA,
+            moduleB
+        }
+    })
+
+
+    const MyComp = {
+        template: `
+            <div>
+                <p>{{countA}}</p>
+                <p>{{doneTodosLength}}</p>
+                <button @click="moduleAAdd">moduleA+</button>
+                <p>{{countB}}</p>
+                <button @click="">moduleB+</button>
+            </div>
+        `,
+        computed: {
+            countA(){
+                //return this.$store.state.a.count
+                return this.$store.state.moduleA.count
+            },
+            countB(){
+                return this.$store.state.moduleB.count
+            },
+            doneTodosLength(){
+                return this.$store.getters.doneTodosLength
+            }
+        },
+        methods: {
+            moduleAAdd(){
+                this.$store.commit('ADD');
+                //this.$store.dispatch('addAsync')
+            }
+        }
+    }
+
+
+    const app = new Vue({
+        el: '#app',
+        store,
+        components: {MyComp},
+        template: `
+            <div class="myApp">
+                <MyComp></MyComp>
+            </div>
+        `
+    })
+</script>
+</body>
+</html>
